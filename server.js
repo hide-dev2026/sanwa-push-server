@@ -2,6 +2,10 @@ const express = require('express');
 const webpush = require('web-push');
 
 const app = express();
+
+const cors = require('cors');
+app.use(cors());
+
 app.use(express.json());
 
 // ★ あなたのVAPIDキーに変更
