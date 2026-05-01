@@ -22,10 +22,10 @@ webpush.setVapidDetails(
 
 // ★ ここにとりあえず1件だけ入れる（あとで改善）
 const subscription = {
-  endpoint: "https://fcm.googleapis.com/fcm/send/e-IZTeJdK8w:APA91bFVeOaVrAkRHBhT46tWF8BGuSQH_LOgz-oUKkG527Lxrx0M8j6A_OkqMstJfFNX88dbyOZTZKrRsjnmV62vUP83xBtcRogNJC_TrYxXj8nGKAQyTWScNY7hdt69PExvAg3IXtyL",
+  endpoint: "https://fcm.googleapis.com/fcm/send/dLKxw2v1AYw:APA91bEd17wmCim498Bq8nPadF66ca1iOIIFv-0qqEdtS491kXq9ULu9fn6MkPaWIYkXtmlkWqCM6g1ZgNU96L8Tqs42buA3orp78vQCZm7yibRB5nymTGdi81OgHr0KdkoGHzGlkmrC",
   keys: {
-    p256dh: "BEZI1esgfIiIsoB_9VpzB_DcPbggnygykkGI6iHPGpHHl88g0Kc8468Mu5GD1zI6J4GcnJauW8J71A7Pa9rWTsU",
-    auth: "iTdkF70GrIPgomNjTSEC-g"
+    p256dh: "BE8e90wGPda3HrFBDjl7AyH9rTpFpYAQQCMgaKt1cOkX5wbGXqHCAthugNqjPsJv6KatLd8jBga3vHPaR5FwxC0",
+    auth: "D2a1tLlp4rVWW7xU8R9rAg"
   }
 };
 
