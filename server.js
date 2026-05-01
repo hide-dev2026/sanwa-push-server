@@ -38,8 +38,14 @@ app.post('/send', async (req, res) => {
     await webpush.sendNotification(subscription, payload);
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
-    res.json({ success: false, error: err.message });
+    console.error("Push送信エラー:", err);
+
+    res.json({
+      success: false,
+      error: err.message,
+      statusCode: err.statusCode,
+      body: err.body
+    });
   }
 });
 
