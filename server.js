@@ -39,24 +39,29 @@ app.post('/send', async (req, res) => {
   try {
     console.log("📨 Push送信開始");
 
-    // ----------------------------------------
-    // ① 通知内容取得（news）
-    // ----------------------------------------
-    const newsRes = await fetch(`${GAS_URL}?action=news`);
-    const newsJson = await newsRes.json();
+    const { title, body } = req.body;
 
-    const newsList = newsJson.data.news;
+        // 👇 fallback（未入力時だけGAS使う）
+    let sendTitle = title;
+    let sendBody = body;
 
-    if (!newsList || newsList.length === 0) {
-      return res.json({ success: false, message: "newsが空です" });
+    if (!sendTitle || !sendBody) {
+      const newsRes = await fetch(`${GAS_URL}?action=news`);
+      const newsJson = await newsRes.json();
+      const newsList = newsJson.data.news;
+
+      if (!newsList || newsList.length === 0) {
+        return res.json({ success: false, message: "newsが空です" });
+      }
+
+      const latest = newsList[0];
+      sendTitle = latest.title;
+      sendBody = latest.body;
     }
 
-    // 👉 1件目を使う（最新）
-    const latest = newsList[0];
-
     const payload = JSON.stringify({
-      title: latest.title || "お知らせ",
-      body: latest.body || "内容がありません",
+      title: sendTitle || "お知らせ",
+      body: sendBody || "内容がありません",
       url: "/sanwa-super/index.html"
     });
 
