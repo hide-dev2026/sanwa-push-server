@@ -72,7 +72,9 @@ app.post('/send', async (req, res) => {
 
     console.log("subscriptionsレスポンス:", subJson);
 
-    let raw = subJson.data.subscriptions;
+    console.log("RAW RESPONSE:", JSON.stringify(subJson, null, 2));
+
+    const raw = subJson?.data?.subscriptions ?? subJson?.subscriptions ?? [];
 
     // 🔥 ここが重要：必ず配列にする
     const subscriptions = Array.isArray(raw)
