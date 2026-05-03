@@ -4,7 +4,6 @@
 const express = require('express');
 const webpush = require('web-push');
 const cors = require('cors');
-const fetch = require('node-fetch');
 
 // ========================================
 // 🚀 初期設定
