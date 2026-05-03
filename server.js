@@ -71,6 +71,8 @@ app.post('/send', async (req, res) => {
     const subRes = await fetch(`${GAS_URL}?action=subscriptions`);
     const subJson = await subRes.json();
 
+    console.log("subscriptionsレスポンス:", subJson);
+    
     const subscriptions = subJson.data.subscriptions;
 
     if (!subscriptions || subscriptions.length === 0) {
