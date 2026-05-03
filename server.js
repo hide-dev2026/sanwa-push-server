@@ -88,7 +88,7 @@ app.post('/send', async (req, res) => {
 
     for (const sub of subscriptions) {
       try {
-        await webpush.sendNotification(sub, payload);
+        await sendWithRetry(sub, payload, 1);
         successCount++;
       } catch (err) {
         failCount++;
@@ -124,6 +124,22 @@ app.post('/send', async (req, res) => {
     res.json({ success: false, error: err.toString() });
   }
 });
+
+async function sendWithRetry(sub, payload, retry = 1) {
+  try {
+    await webpush.sendNotification(sub, payload);
+    return true;
+  } catch (err) {
+    console.log("❌ 送信失敗:", err.statusCode);
+
+    if (retry > 0) {
+      console.log("🔁 リトライ...");
+      return await sendWithRetry(sub, payload, retry - 1);
+    }
+
+    throw err;
+  }
+}
 
 // ========================================
 // 🧪 テスト用（手動送信）
