@@ -30,7 +30,7 @@ webpush.setVapidDetails(
 // ========================================
 // 🌐 GAS API URL
 // ========================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbymQE2iZfO0S9nlvUYT03UfBTjAVg2eugBJZ6CWoKtQLvVyuThMoOEqiUDBtfaxoXZ7/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbz7yPsutwwvbVAP5kF0xY6JHt9HQth9UCrwk6DJ-76Qtmn1KkJZQTBwvyJX-lp318VL/exec";
 
 // ========================================
 // 📡 Push送信API（全員配信）
@@ -72,7 +72,7 @@ app.post('/send', async (req, res) => {
     const subJson = await subRes.json();
 
     console.log("subscriptionsレスポンス:", subJson);
-    
+
     const subscriptions = subJson.data.subscriptions;
 
     if (!subscriptions || subscriptions.length === 0) {
