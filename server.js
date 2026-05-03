@@ -1,14 +1,21 @@
+// ========================================
+// 📦 モジュール
+// ========================================
 const express = require('express');
 const webpush = require('web-push');
-
-const app = express();
-
 const cors = require('cors');
-app.use(cors());
+const fetch = require('node-fetch');
 
+// ========================================
+// 🚀 初期設定
+// ========================================
+const app = express();
+app.use(cors());
 app.use(express.json());
 
-// ★ あなたのVAPIDキーに変更
+// ========================================
+// 🔐 VAPIDキー（あなたの値）
+// ========================================
 const vapidKeys = {
   publicKey: 'BGp9U_uO-3Xh1rHHdGgGH24L3abnjnHd0wkTFTZtAkBCEU1Gkxv01IT911WPmYsOcovvY51ZLp1Gek0RhV6MPmM',
   privateKey: '1_5iexGfhO4BVOrA336S8Z7fIADtiHLezDe0PXN-dPs'
@@ -20,33 +27,105 @@ webpush.setVapidDetails(
   vapidKeys.privateKey
 );
 
-// ★ ここにとりあえず1件だけ入れる（あとで改善）
-const subscription = {
-  endpoint: "https://fcm.googleapis.com/fcm/send/dLKxw2v1AYw:APA91bEd17wmCim498Bq8nPadF66ca1iOIIFv-0qqEdtS491kXq9ULu9fn6MkPaWIYkXtmlkWqCM6g1ZgNU96L8Tqs42buA3orp78vQCZm7yibRB5nymTGdi81OgHr0KdkoGHzGlkmrC",
-  keys: {
-    p256dh: "BE8e90wGPda3HrFBDjl7AyH9rTpFpYAQQCMgaKt1cOkX5wbGXqHCAthugNqjPsJv6KatLd8jBga3vHPaR5FwxC0",
-    auth: "D2a1tLlp4rVWW7xU8R9rAg"
-  }
-};
+// ========================================
+// 🌐 GAS API URL
+// ========================================
+const GAS_URL = "https://script.google.com/macros/s/XXXX/exec";
 
+// ========================================
+// 📡 Push送信API（全員配信）
+// ========================================
 app.post('/send', async (req, res) => {
-  const { title, body } = req.body;
-
-  const payload = JSON.stringify({ title, body });
-
   try {
-    await webpush.sendNotification(subscription, payload);
-    res.json({ success: true });
-  } catch (err) {
-    console.error("Push送信エラー:", err);
+    console.log("📨 Push送信開始");
 
-    res.json({
-      success: false,
-      error: err.message,
-      statusCode: err.statusCode,
-      body: err.body
+    // ----------------------------------------
+    // ① 通知内容取得（news）
+    // ----------------------------------------
+    const newsRes = await fetch(`${GAS_URL}?action=news`);
+    const newsJson = await newsRes.json();
+
+    const newsList = newsJson.data.news;
+
+    if (!newsList || newsList.length === 0) {
+      return res.json({ success: false, message: "newsが空です" });
+    }
+
+    // 👉 1件目を使う（最新）
+    const latest = newsList[0];
+
+    const payload = JSON.stringify({
+      title: latest.title || "お知らせ",
+      body: latest.body || "内容がありません"
     });
+
+    // ----------------------------------------
+    // ② 購読者取得
+    // ----------------------------------------
+    const subRes = await fetch(`${GAS_URL}?action=subscriptions`);
+    const subJson = await subRes.json();
+
+    const subscriptions = subJson.data.subscriptions;
+
+    if (!subscriptions || subscriptions.length === 0) {
+      return res.json({ success: false, message: "購読者がいません" });
+    }
+
+    console.log(`👥 配信対象: ${subscriptions.length}件`);
+
+    // ----------------------------------------
+    // ③ 全員に送信
+    // ----------------------------------------
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const sub of subscriptions) {
+      try {
+        await webpush.sendNotification(sub, payload);
+        successCount++;
+      } catch (err) {
+        failCount++;
+
+        console.error("❌ 送信失敗:", err.statusCode);
+
+        // 無効な購読（410/404）は削除対象
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          console.log("⚠️ 無効なsubscription（削除候補）");
+        }
+      }
+    }
+
+    // ----------------------------------------
+    // 結果返却
+    // ----------------------------------------
+    res.json({
+      success: true,
+      total: subscriptions.length,
+      successCount,
+      failCount
+    });
+
+  } catch (err) {
+    console.error("🔥 全体エラー:", err);
+    res.json({ success: false, error: err.toString() });
   }
 });
 
-app.listen(3000, () => console.log("server start"));
+// ========================================
+// 🧪 テスト用（手動送信）
+// ========================================
+app.get('/test', async (req, res) => {
+  const payload = JSON.stringify({
+    title: "テスト通知",
+    body: "これはテストです"
+  });
+
+  res.json({ message: "POST /send を使ってください" });
+});
+
+// ========================================
+// ▶ 起動
+// ========================================
+app.listen(3000, () => {
+  console.log("🚀 server start http://localhost:3000");
+});
