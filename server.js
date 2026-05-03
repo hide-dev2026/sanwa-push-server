@@ -84,7 +84,7 @@ app.post('/send', async (req, res) => {
     if (subscriptions.length === 0) {
       return res.json({ success: false, message: "購読者がいません" });
     }
-+-
+
     console.log(`👥 配信対象: ${subscriptions.length}件`);
 
     // ----------------------------------------
