@@ -88,7 +88,7 @@ app.post('/send', async (req, res) => {
 
     for (const sub of subscriptions) {
       try {
-        await sendWithRetry(sub, payload, 1);
+        await sendWithRetry(sub, payload, 2); // リトライ2回
         successCount++;
       } catch (err) {
         failCount++;
