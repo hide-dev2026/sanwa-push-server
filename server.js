@@ -29,7 +29,7 @@ webpush.setVapidDetails(
 // ========================================
 // 🌐 GAS API URL
 // ========================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyGEIav687emUsHhiSf7LxirLkrAERQSVjeEKS5c1RgqeCH9ugdiETOHeN9elER99bR/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbz0kiKCu0SvUO0ZOhC8siGPRSbdF_QjF5E-TqwKrNfQhlzJky43ToeUE2UfCVsMTb14/exec";
 
 // ========================================
 // 📡 Push送信API（全員配信）
@@ -72,12 +72,19 @@ app.post('/send', async (req, res) => {
 
     console.log("subscriptionsレスポンス:", subJson);
 
-    const subscriptions = subJson.data.subscriptions;
+    let raw = subJson.data.subscriptions;
 
-    if (!subscriptions || subscriptions.length === 0) {
+    // 🔥 ここが重要：必ず配列にする
+    const subscriptions = Array.isArray(raw)
+      ? raw
+      : raw
+        ? [raw]
+        : [];
+
+    if (subscriptions.length === 0) {
       return res.json({ success: false, message: "購読者がいません" });
     }
-
++-
     console.log(`👥 配信対象: ${subscriptions.length}件`);
 
     // ----------------------------------------
