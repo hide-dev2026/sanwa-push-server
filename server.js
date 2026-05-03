@@ -56,7 +56,8 @@ app.post('/send', async (req, res) => {
 
     const payload = JSON.stringify({
       title: latest.title || "お知らせ",
-      body: latest.body || "内容がありません"
+      body: latest.body || "内容がありません",
+      url: "/sanwa-super/index.html"
     });
 
     // ----------------------------------------
