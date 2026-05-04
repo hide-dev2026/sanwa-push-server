@@ -29,7 +29,7 @@ webpush.setVapidDetails(
 // ========================================
 // 🌐 GAS API URL
 // ========================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbx028Gvv3I9lgxyaniHWL1ZfAmUhz8ndDF5fyKU7AO7J60Fel_C8M7eeDvYDcSO0I90/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxm4pJu4amNHF45LFB4et9KvNuOszduUWQkpIP1PDTMKugNYDHNulFj1YhfsPhx66Lg/exec";
 
 // ========================================
 // 📡 Push送信API（全員配信）
