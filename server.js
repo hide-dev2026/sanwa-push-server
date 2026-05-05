@@ -29,7 +29,7 @@ webpush.setVapidDetails(
 // ========================================
 // 🌐 GAS API URL
 // ========================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzcJ50TW0rk-vVnBhpK-5ggjSlds7IsordzPEItjlXJpqwBQrZTxmSZpyBFY1QKN1CI/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwdx3akWQrY7eARPcaAjv-oVwCRR-z8I9JFUz0ELXbvNrDcJw8laW0zcQb4eAIGIVLv/exec";
 
 // ========================================
 // 📡 Push送信API（全員配信）
@@ -97,7 +97,7 @@ app.post('/send', async (req, res) => {
 
     for (const sub of subscriptions) {
       try {
-        await sendWithRetry(sub, payload, 2); // リトライ2回
+        await sendWithRetry(sub, payload, 1); // リトライ1回
         successCount++;
       } catch (err) {
         failCount++;
@@ -107,6 +107,9 @@ app.post('/send', async (req, res) => {
         // 無効な購読（410/404）は削除対象
         if (err.statusCode === 410 || err.statusCode === 404) {
           console.log("⚠️ 無効なsubscription（削除候補）");
+
+          // GASで失敗の記録をさせる
+          await markAsInvalid(sub.endpoint, err.statusCode);
         }
       }
     }
