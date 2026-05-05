@@ -29,7 +29,7 @@ webpush.setVapidDetails(
 // ========================================
 // 🌐 GAS API URL
 // ========================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwtRsnCxnxH76jAvVcp7MyCas06dZH4LpUoLMRgKWPQ2Bm-q2AnRX1wkyZnt3EBOUen/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwHZeyeCXHnHoJq6Bj6IY6TGDNZdTrjfmcBoInGWlIdWrc8ZXS2uh665POovHpViirp/exec";
 
 // ========================================
 // 📡 Push送信API（全員配信）
@@ -109,7 +109,7 @@ app.post('/send', async (req, res) => {
           console.log("⚠️ 無効なsubscription（削除候補）");
 
           // GASで失敗の記録をさせる
-          await markAsInvalid(sub.endpoint);
+          // await markAsInvalid(sub.endpoint);
         }
       }
     }
