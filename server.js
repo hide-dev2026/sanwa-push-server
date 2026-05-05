@@ -109,7 +109,7 @@ app.post('/send', async (req, res) => {
           console.log("⚠️ 無効なsubscription（削除候補）");
 
           // GASで失敗の記録をさせる
-          await markAsInvalid(sub.endpoint, err.statusCode);
+          await markAsInvalid(sub.endpoint);
         }
       }
     }
