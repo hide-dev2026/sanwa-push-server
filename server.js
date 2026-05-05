@@ -29,7 +29,7 @@ webpush.setVapidDetails(
 // ========================================
 // 🌐 GAS API URL
 // ========================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwHZeyeCXHnHoJq6Bj6IY6TGDNZdTrjfmcBoInGWlIdWrc8ZXS2uh665POovHpViirp/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyuesRLiJde69UH7lqMJtQCkKu6invVMMfIvSePXX1HqbsRnE7d2MDTIgfF1ebw09un/exec";
 
 // ========================================
 // 📡 Push送信API（全員配信）
@@ -109,7 +109,7 @@ app.post('/send', async (req, res) => {
           console.log("⚠️ 無効なsubscription（削除候補）");
 
           // GASで失敗の記録をさせる
-          // await markAsInvalid(sub.endpoint);
+          await markAsInvalid(sub.endpoint);
         }
       }
     }
@@ -136,6 +136,21 @@ app.post('/send', async (req, res) => {
     res.json({ success: false, error: err.toString() });
   }
 });
+
+// ========================================
+// ⚠️ GASに無効な購読を報告する関数
+// ========================================
+async function markAsInvalid(endpoint) {
+  try {
+    // GAS側で実装した markInvalid を叩く
+    // action=mark_invalid はGAS側で新しく定義する必要があります
+    const url = `${GAS_URL}?action=mark_invalid&endpoint=${encodeURIComponent(endpoint)}`;
+    await fetch(url);
+    console.log("✅ GASへ無効エンドポイントを報告しました:", endpoint);
+  } catch (e) {
+    console.error("❌ GASへの報告に失敗:", e);
+  }
+}
 
 async function sendWithRetry(sub, payload, retry = 1) {
   try {
