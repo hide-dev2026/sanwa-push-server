@@ -140,7 +140,7 @@ app.post('/send', async (req, res) => {
 // ========================================
 // ⚠️ GASに無効な購読を報告する関数
 // ========================================
-async function markAsInvalid(endpoint) {
+async function markAsInvalid(endpoint, statusCode) {
   try {
     // GAS側で実装した markInvalid を叩く
     // action=mark_invalid はGAS側で新しく定義する必要があります
