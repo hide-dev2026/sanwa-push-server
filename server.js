@@ -105,7 +105,7 @@ app.post('/send', async (req, res) => {
         console.error("❌ 送信失敗:", err.statusCode);
 
         // 無効な購読（410/404）は削除対象
-        if (e === 410 || err.statusCode === 404) {
+        if (err.statusCode === 410 || err.statusCode === 404) {
           console.log("⚠️ 無効なsubscription（削除候補）");
 
           // GASで失敗の記録をさせる
