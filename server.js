@@ -147,8 +147,8 @@ async function markAsInvalid(endpoint, statusCode) {
     const url = `${GAS_URL}?action=mark_invalid&endpoint=${encodeURIComponent(endpoint)}&code=${statusCode}`;
     await fetch(url);
     console.log(`✅ GASへ報告完了 (Code: ${statusCode}, Endpoint: ${endpoint})`);
-  } catch (e) {
-    console.error("❌ GASへの報告に失敗:", e);
+  } catch (error) {
+    console.error("❌ GASへの報告に失敗:", error);
   }
 }
 
