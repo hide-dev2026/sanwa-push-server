@@ -105,11 +105,11 @@ app.post('/send', async (req, res) => {
         console.error("❌ 送信失敗:", err.statusCode);
 
         // 無効な購読（410/404）は削除対象
-        if (err.statusCode === 410 || err.statusCode === 404) {
+        if (e === 410 || err.statusCode === 404) {
           console.log("⚠️ 無効なsubscription（削除候補）");
 
           // GASで失敗の記録をさせる
-          await markAsInvalid(sub.endpoint);
+          await markAsInvalid(sub.endpoint, err.statusCode);
         }
       }
     }
@@ -144,9 +144,9 @@ async function markAsInvalid(endpoint) {
   try {
     // GAS側で実装した markInvalid を叩く
     // action=mark_invalid はGAS側で新しく定義する必要があります
-    const url = `${GAS_URL}?action=mark_invalid&endpoint=${encodeURIComponent(endpoint)}`;
+    const url = `${GAS_URL}?action=mark_invalid&endpoint=${encodeURIComponent(endpoint)}&code=${statusCode}`;
     await fetch(url);
-    console.log("✅ GASへ無効エンドポイントを報告しました:", endpoint);
+    console.log(`✅ GASへ報告完了 (Code: ${statusCode}, Endpoint: ${endpoint})`);
   } catch (e) {
     console.error("❌ GASへの報告に失敗:", e);
   }
