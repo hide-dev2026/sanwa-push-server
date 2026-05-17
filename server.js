@@ -34,13 +34,16 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbxdYXKQ1GD08gOcPpc116UH
 // ========================================
 // 📡 Push送信API（全員配信）
 // ========================================
+// ========================================
+// 📡 Push送信API（全員配信）
+// ========================================
 app.post('/send', async (req, res) => {
   try {
     console.log("📨 Push送信開始");
 
     const { title, body } = req.body;
 
-        // 👇 fallback（未入力時だけGAS使う）
+    // 👇 fallback（未入力時だけGAS使う）
     let sendTitle = title;
     let sendBody = body;
 
@@ -70,18 +73,11 @@ app.post('/send', async (req, res) => {
     const subRes = await fetch(`${GAS_URL}?action=subscriptions`);
     const subJson = await subRes.json();
 
-    console.log("subscriptionsレスポンス:", subJson);
-
     console.log("RAW RESPONSE:", JSON.stringify(subJson, null, 2));
 
     const raw = subJson?.data?.subscriptions ?? subJson?.subscriptions ?? [];
 
-    // 🔥 ここが重要：必ず配列にする
-    const subscriptions = Array.isArray(raw)
-      ? raw
-      : raw
-        ? [raw]
-        : [];
+    const subscriptions = Array.isArray(raw) ? raw : raw ? [raw] : [];
 
     if (subscriptions.length === 0) {
       return res.json({ success: false, message: "購読者がいません" });
@@ -90,29 +86,32 @@ app.post('/send', async (req, res) => {
     console.log(`👥 配信対象: ${subscriptions.length}件`);
 
     // ----------------------------------------
-    // ③ 全員に送信
+    // ③ 全員に【一斉・並列】送信（ここを大改造）
     // ----------------------------------------
-    let successCount = 0;
-    let failCount = 0;
-
-    for (const sub of subscriptions) {
+    // 全員分の送信処理（Promise）を配列にまとめる
+    const pushPromises = subscriptions.map(async (sub) => {
       try {
         await sendWithRetry(sub, payload, 1); // リトライ1回
-        successCount++;
+        return { success: true };
       } catch (err) {
-        failCount++;
-
         console.error("❌ 送信失敗:", err.statusCode);
 
-        // 無効な購読（410/404）は削除対象
+        // 無効な購読（410/404）はバックグラウンドでGASに報告（全体の送信速度を落とさない）
         if (err.statusCode === 410 || err.statusCode === 404) {
           console.log("⚠️ 無効なsubscription（削除候補）");
-
-          // GASで失敗の記録をさせる
-          await markAsInvalid(sub.endpoint, err.statusCode);
+          // awaitをあえて外すか、独立させて全体の処理を巻き込まないようにする
+          markAsInvalid(sub.endpoint, err.statusCode).catch(e => console.error("GAS報告エラー:", e));
         }
+        return { success: false };
       }
-    }
+    });
+
+    // Promise.all で全員分を一斉に並列実行！
+    const results = await Promise.all(pushPromises);
+
+    // 結果を集計する
+    const successCount = results.filter(r => r.success).length;
+    const failCount = results.filter(r => !r.success).length;
 
     if (successCount === 0) {
       return res.json({
